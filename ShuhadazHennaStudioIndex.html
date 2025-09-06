@@ -1,0 +1,393 @@
+<!--
+Shuhadaz Henna Studio - Single Page Static Site
+Place this file at the project root (index.html). Create an /assets folder for images and logo.
+Instructions (short):
+ - Put logo at: /assets/logo.png (or logo.svg)
+ - Add product images in /assets/products/ (filenames as used in products array below, e.g. cone1.png)
+ - Add gallery images in /assets/gallery/ (gallery1.png ... up to 12)
+ - To deploy: drag & drop this folder on Netlify Drop OR push to GitHub and connect repository in Netlify.
+
+Features:
+ - Gold + premium mehndi-green theme
+ - Responsive product grid (3 columns desktop, 2 tablet, 1 mobile)
+ - WhatsApp enquiry button opens chat with prefilled message (includes product name + page link)
+ - Gallery (up to 12 images, 3 per row)
+ - Sticky nav that scrolls to sections
+ - Floating Instagram follow button + WhatsApp quick button
+ - Products editable via `products` array in the <script> section
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shuhadaz Henna Studio</title>
+  <link rel="icon" href="assets/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    h1, h2, h3, .accent-line {
+      color: #d4af37; /* premium gold */
+    }
+    :root{
+      --green:#08331f; /* deep mehndi green */
+      --green-2:#0b4b2e;
+      --gold-1:linear-gradient(90deg,#d9b44a,#ffd36b);
+      --card-bg: rgba(255,255,255,0.03);
+      --glass: rgba(255,255,255,0.04);
+      --text-light: #f8f6f2;
+      --muted: rgba(248,246,242,0.75);
+      --accent: #d4af37;
+      --radius: 16px;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      background: radial-gradient(circle at 10% 10%, rgba(212,175,55,0.06), transparent 5%),
+                  linear-gradient(180deg, var(--green) 0%, var(--green-2) 100%);
+      color:var(--text-light);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding-bottom:120px;
+    }
+    header{
+      position:sticky;top:0;z-index:40;
+      backdrop-filter: blur(6px);
+      background: linear-gradient(180deg, rgba(8,51,31,0.65), rgba(8,51,31,0.45));
+      border-bottom:1px solid rgba(255,255,255,0.03);
+    }
+    .container{max-width:1100px;margin:0 auto;padding:28px 20px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .brand img{height:56px;width:auto;border-radius:8px;object-fit:contain}
+    .title h1{margin:0;font-family:'Playfair Display', serif;font-size:22px;letter-spacing:0.6px;color:var(--text-light)}
+    .subtitle{font-size:13px;color:var(--muted)}
+    nav{display:flex;gap:12px;align-items:center}
+    nav a{color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:10px;font-weight:600}
+
+    /* Hero */
+    .hero{padding:48px 0 28px;text-align:center}
+    .hero h2{font-family:'Playfair Display',serif;font-size:40px;margin:6px 0 12px;color:var(--text-light);letter-spacing:0.4px}
+    .hero p{max-width:760px;margin:0 auto;color:var(--muted);font-size:16px}
+
+    /* Products */
+    .section{padding:48px 0}
+    .section h3{font-family:'Playfair Display',serif;font-size:26px;margin:0 0 18px;color:var(--accent)}
+    .grid{display:grid;gap:18px}
+    @media(min-width:1024px){.grid{grid-template-columns:repeat(3,1fr)}}
+    @media(min-width:640px) and (max-width:1023px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:639px){.grid{grid-template-columns:repeat(1,1fr)}}
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:12px}
+    .card img{width:100%;height:auto;max-height:420px;object-fit:cover;border-radius:10px}
+    .prod-name{font-weight:600;color:var(--text-light);font-size:16px;text-align:center}
+    .prod-actions{display:flex;gap:8px}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;font-weight:700;border:none;cursor:pointer}
+    .btn-whatsapp{background:linear-gradient(90deg,#25D366,#1ebe5a);color:white}
+    .btn-whatsapp svg{height:18px}
+
+    /* Gallery */
+    .gallery-grid{display:grid;gap:12px}
+    @media(min-width:1024px){.gallery-grid{grid-template-columns:repeat(3,1fr)}}
+    @media(min-width:640px) and (max-width:1023px){.gallery-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:639px){.gallery-grid{grid-template-columns:repeat(1,1fr)}}
+    .gallery-grid img{width:100%;height:auto;border-radius:10px;object-fit:cover}
+
+    /* Footer */
+    footer{padding:28px 0;background:linear-gradient(180deg, rgba(0,0,0,0.12), transparent);border-top:1px solid rgba(255,255,255,0.03)}
+    .footer-inner{display:flex;flex-direction:row;justify-content:space-between;align-items:center;gap:8px}
+    .socials{display:flex;gap:10px;align-items:center}
+    .small{color:var(--muted);font-size:13px}
+
+    /* Floating buttons */
+    .floating{position:fixed;right:18px;bottom:22px;display:flex;flex-direction:column;gap:12px;z-index:60}
+    .fab{width:56px;height:56px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:var(--accent);color:#072515;text-decoration:none;box-shadow:0 8px 20px rgba(0,0,0,0.35);border:3px solid rgba(255,255,255,0.06)}
+    .fab.instagram{background:transparent;border:2px solid rgba(212,175,55,0.14);color:var(--text-light)}
+
+    /* Responsive tweaks */
+    @media(max-width:520px){.brand img{height:48px}.hero h2{font-size:28px}}
+
+    /* subtle gold outline for headings */
+    .accent-line{display:inline-block;padding:6px 12px;border-radius:999px;background:linear-gradient(90deg, rgba(212,175,55,0.06), transparent);border:1px solid rgba(212,175,55,0.08)}
+
+     .floating-buttons {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 999;
+    }
+    .floating-buttons a {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--green, #08331f);
+      border: 1px solid rgba(212,175,55,0.6);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+      opacity: 0.85;
+      transition: all 0.3s ease;
+    }
+    .floating-buttons a.instagram {
+      background: #111;
+    }
+    .floating-buttons a:hover {
+      opacity: 1;
+      transform: scale(1.08);
+      box-shadow: 0 4px 12px rgba(212,175,55,0.45);
+    }
+    .floating-buttons img {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* WhatsApp button inside product card */
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #25d366; /* WhatsApp green */
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 14px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.btn-whatsapp:hover {
+  background: #1ebe5d; /* darker green */
+}
+
+/* WhatsApp logo size in button */
+.btn-whatsapp .wa-icon {
+  width: 16px;
+  height: 16px;
+}
+/* Full-page elegant gradient */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #0b2e13, #145a32, #196f3d, #0d3d1d);
+  background-attachment: fixed;
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+h1, h2, h3, .accent-line {
+  color: #d4af37; /* Premium gold */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+p, .prod-name {
+  color: #ffffff;
+}
+
+</style>
+</head>
+<body>
+  <header>
+    <div class="container topbar">
+      <div class="brand">
+        <img src="assets/logo.png" alt="Shuhadaz Henna Studio logo" id="site-logo"/>
+        <div class="title">
+          <h1>Shuhadaz Henna Studio</h1>
+          <div class="subtitle">Premium mehndi cones · bridal kits · natural aftercare</div>
+        </div>
+      </div>
+      <nav>
+        <a href="#products">Products</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="container">
+        <h2>Elegant. Natural. Handcrafted Henna.</h2>
+        <p>Shuhadaz brings premium henna cones and studio-quality bridal kits crafted for lasting color and comfort. Browse products below — tap the WhatsApp button to inquire with a single click.</p>
+      </div>
+    </section>
+
+    <section class="section" id="products">
+  <div class="container">
+    <h3 class="accent-line">Products</h3>
+    <div class="grid" id="products-grid">
+
+      <!-- Organic Henna Cone -->
+      <div class="card" id="cone1">
+        <img src="assets/products/cone1.png" alt="Organic Henna Cone"/>
+        <div class="prod-name">Organic Henna Cone</div>
+        <div class="prod-actions">
+          <a class="btn btn-whatsapp" 
+             href="https://wa.me/917510667997?text=Hi!%20I%27m%20interested%20in%20Organic%20Henna%20Cone.%20Image:%20https://yourdomain.netlify.app/assets/products/cone1.png" 
+             target="_blank" title="Enquire on WhatsApp">
+            <img src="assets/icons/whatsapp.png" alt="WhatsApp" class="wa-icon"> Enquire
+          </a>
+        </div>
+      </div>
+
+      <!-- Nail Cone -->
+      <div class="card" id="cone2">
+        <img src="assets/products/cone2.png" alt="Nail Cone"/>
+        <div class="prod-name">Nail Cone</div>
+        <div class="prod-actions">
+          <a class="btn btn-whatsapp" 
+             href="https://wa.me/917510667997?text=Hi!%20I%27m%20interested%20in%20Nail%20Cone.%20Image:%20https://yourdomain.netlify.app/assets/products/cone2.png" 
+             target="_blank" title="Enquire on WhatsApp">
+            <img src="assets/icons/whatsapp.png" alt="WhatsApp" class="wa-icon"> Enquire
+          </a>
+        </div>
+      </div>
+
+      <!-- Tea Tree Oil -->
+      <div class="card" id="oil1">
+        <img src="assets/products/teatreeoil.png" alt="Tea Tree Oil"/>
+        <div class="prod-name">Tea Tree Oil</div>
+        <div class="prod-actions">
+          <a class="btn btn-whatsapp" 
+             href="https://wa.me/917510667997?text=Hi!%20I%27m%20interested%20in%20Tea%20Tree%20Oil.%20Image:%20https://yourdomain.netlify.app/assets/products/teatreeoil.png" 
+             target="_blank" title="Enquire on WhatsApp">
+            <img src="assets/icons/whatsapp.png" alt="WhatsApp" class="wa-icon"> Enquire
+          </a>
+        </div>
+      </div>
+
+      <!-- Eucalyptus Oil -->
+      <div class="card" id="oil2">
+        <img src="assets/products/eucalyptusoil.png" alt="Eucalyptus Oil"/>
+        <div class="prod-name">Eucalyptus Oil</div>
+        <div class="prod-actions">
+          <a class="btn btn-whatsapp" 
+             href="https://wa.me/917510667997?text=Hi!%20I%27m%20interested%20in%20Eucalyptus%20Oil.%20Image:%20https://yourdomain.netlify.app/assets/products/eucalyptusoil.png" 
+             target="_blank" title="Enquire on WhatsApp">
+            <img src="assets/icons/whatsapp.png" alt="WhatsApp" class="wa-icon"> Enquire
+          </a>
+        </div>
+      </div>
+
+      <!-- Natural Henna Powder -->
+      <div class="card" id="powder1">
+        <img src="assets/products/hennapowder.png" alt="Natural Henna Powder"/>
+        <div class="prod-name">Natural Henna Powder</div>
+        <div class="prod-actions">
+          <a class="btn btn-whatsapp" 
+             href="https://wa.me/917510667997?text=Hi!%20I%27m%20interested%20in%20Natural%20Henna%20Powder.%20Image:%20https://yourdomain.netlify.app/assets/products/hennapowder.png" 
+             target="_blank" title="Enquire on WhatsApp">
+            <img src="assets/icons/whatsapp.png" alt="WhatsApp" class="wa-icon"> Enquire
+          </a>
+        </div>
+      </div>
+
+      <!-- Cone Sheet 1 -->
+      <div class="card" id="sheet1">
+        <img src="assets/products/sheet1.png" alt="Cone Sheet 1"/>
+        <div class="prod-name">Cone Sheet</div>
+        <div class="prod-actions">
+          <a class="btn btn-whatsapp" 
+             href="https://wa.me/917510667997?text=Hi!%20I%27m%20interested%20in%20Cone%20Sheet.%20Image:%20https://yourdomain.netlify.app/assets/products/sheet1.png" 
+             target="_blank" title="Enquire on WhatsApp">
+            <img src="assets/icons/whatsapp.png" alt="WhatsApp" class="wa-icon"> Enquire
+          </a>
+        </div>
+      </div>
+
+      <!-- Cone Sheet 2 -->
+      <div class="card" id="sheet2">
+        <img src="assets/products/sheet2.png" alt="Cone Sheet 2"/>
+        <div class="prod-name">Cone Sheet</div>
+        <div class="prod-actions">
+          <a class="btn btn-whatsapp" 
+             href="https://wa.me/917510667997?text=Hi!%20I%27m%20interested%20in%20Cone%20Sheet.%20Image:%20https://yourdomain.netlify.app/assets/products/sheet2.png" 
+             target="_blank" title="Enquire on WhatsApp">
+            <img src="assets/icons/whatsapp.png" alt="WhatsApp" class="wa-icon"> Enquire
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+    <section class="section" id="gallery">
+      <div class="container">
+        <h3 class="accent-line">Henna Gallery</h3>
+        <div class="gallery-grid">
+          <img src="assets/gallery/gallery1.png" alt="Gallery image 1"/>
+          <img src="assets/gallery/gallery2.png" alt="Gallery image 2"/>
+          <img src="assets/gallery/gallery3.png" alt="Gallery image 3"/>
+          <img src="assets/gallery/gallery4.png" alt="Gallery image 4"/>
+          <img src="assets/gallery/gallery5.png" alt="Gallery image 5"/>
+          <img src="assets/gallery/gallery6.png" alt="Gallery image 6"/>
+          <img src="assets/gallery/gallery7.png" alt="Gallery image 7"/>
+          <img src="assets/gallery/gallery8.png" alt="Gallery image 8"/>
+          <img src="assets/gallery/gallery9.png" alt="Gallery image 9"/>
+          <img src="assets/gallery/gallery10.png" alt="Gallery image 10"/>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact">
+      <div class="container">
+        <h3 class="accent-line">Contact</h3>
+        <p class="small">Prefer WhatsApp — quick replies. Use the green buttons beside each product or the floating WhatsApp icon.</p>
+        <div style="margin-top:18px;display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+          <a class="btn btn-whatsapp" href="https://wa.me/917510667997?text=Hi%20Shuhadaz%2C%20I'm%20interested%20in%20your%20products.">
+            Message on WhatsApp
+          </a>
+          <a href="https://instagram.com/shuhadaz_hennastudio" target="_blank" class="btn" style="background:transparent;border:1px solid rgba(212,175,55,0.08);color:var(--text-light)">
+            Visit Instagram
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div>
+        <div style="font-weight:700;color:var(--text-light)">Shuhadaz Henna Studio</div>
+        <div class="small">Instagram: @shuhadaz_henna &nbsp; | &nbsp; @shuhadaz_hennastudio</div>
+      </div>
+    </div>
+    <div class="container" style="margin-top:12px">
+      <div class="small">© 2025 Shuhadaz Henna Studio. All rights reserved.</div>
+    </div>
+  </footer>
+
+  <!-- Floating action buttons -->
+<div class="floating-buttons">
+  <!-- WhatsApp -->
+  <a href="https://wa.me/917510667997" target="_blank" title="Chat on WhatsApp">
+    <img src="assets/icons/whatsapp.png" alt="WhatsApp">
+  </a>
+
+  <!-- Instagram -->
+  <a href="https://instagram.com/shuhadaz_hennastudio" target="_blank" class="instagram" title="Visit Instagram">
+    <img src="assets/icons/instagram.png" alt="Instagram">
+  </a>
+</div>
+
+</body>
+
+</html>
